@@ -3,6 +3,9 @@ __pycache__/
 *.pyc
 *.pyo
 
-# Ignore environment-related files
+# Ignore environment and token-related files
 .env
 venv/
+config.json
+*.token
+*token*
