@@ -4,7 +4,7 @@ from discord.ext.commands import Context as CTX
 from discord.ext import commands
 from discord import app_commands
 from core import log, format_traceback
-from .check_permission import AppNotOwner, MissingReference
+from .check_permission import AppNotOwner, MissingReference, AppTooLowHierarchy, TooLowHierarchy
 from config import ERROR, events, EV_STARTUP
 from globals import Globals as G
 
@@ -64,6 +64,15 @@ def check_error(error: discord.DiscordException,
         return "Only the bot owner can use this command.", \
                 "Yup this command can be used only by me, "\
                 "the one who wrote this error message"
+    if isinstance(error, (TooLowHierarchy, AppTooLowHierarchy)):
+        if isinstance(error.target, (discord.Member, discord.User)):
+            highest_role: discord.Role | None = getattr(error.target, "top_role", None)
+            highest_role_name = f" (`{highest_role.name}`)" if highest_role else ""
+            return f"Your role Hierarchy is too low to affect `{error.target.name}`", \
+                    f"You cannot modify `{error.target.name}` because their "\
+                    f"highest role{highest_role_name} is equal to or higher than yours."
+        return "Your role Hierarchy is too low to use this command", \
+                "This command requires a higher role than the one you currently have."
     if isinstance(error, (commands.CommandOnCooldown, app_commands.CommandOnCooldown)):
         return "This command is on cooldown.", \
                 f"Try again in {round(error.retry_after, 2)} seconds."
