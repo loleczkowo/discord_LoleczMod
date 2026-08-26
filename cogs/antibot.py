@@ -1,12 +1,15 @@
+from asyncio import sleep
+from typing import Dict
+import time
 import discord
 from discord import app_commands
 from discord.ext import commands
-from core import Memory, log
+from core import Memory, log, check_hierarchy
+from core.handle_command_error import AppTooLowHierarchy
 from config import ids_objects, IDs, DISCORD_INVITE, categories, CT_MODERATOR, INFO
-from asyncio import sleep
 
 BOT_BAN_MESSAGE = (
-    f"Beepboop, you were detected as a bot (reason `{{REASON}}`)\n"
+    f"Beepboop, you were detected as a bot (reason `{{reason}}`)\n"
     f"**in a minute will be able to rejoin using this invite:** {DISCORD_INVITE}"
 )
 
@@ -15,6 +18,11 @@ BOT_BAN_MESSAGE = (
 class AntiBot(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
+        self.pending_unbans = Memory("pending_unbans", {}, self, save_on_change=True)
+        for user_id, unban_at in self.pending_unbans.mem.items():
+            self.bot.loop.create_task(
+                self._unban_later(int(user_id), float(unban_at))
+            )
 
     # MEMBER/NOT A MEMBER ROLES
     @commands.Cog.listener()
@@ -54,7 +62,7 @@ class AntiBot(commands.Cog):
         # 2. Ban the user to get rid of their messages
         # 3. After few minutes unban the user so they can rejoin
         try:
-            await user.send(BOT_BAN_MESSAGE)
+            await user.send(BOT_BAN_MESSAGE.format(reason=reason))
         except Exception:
             pass
             # not my problem lmfao
@@ -64,7 +72,10 @@ class AntiBot(commands.Cog):
 
         await user.ban(delete_message_seconds=2*60*60, reason=f"(BOT) {reason}")
         # now wait 1 minutes and unban
-        self.bot.loop.create_task(self._unban_later(user, 60*1))
+        unban_at = time.time() + 60
+        self.pending_unbans.mem[str(user.id)] = unban_at
+        self.pending_unbans.touch()
+        self.bot.loop.create_task(self._unban_later(user, 60))
         log(INFO(to_discord=True), f"**ANTI_DC_BOT: BOT BANNED `{user.name}:{user.id}`**\nreason: `{reason}`")
 
     async def _unban_later(self, user: discord.Member, delay: int):
