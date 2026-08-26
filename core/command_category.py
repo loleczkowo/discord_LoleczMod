@@ -15,8 +15,8 @@ class Categories:
         self._sort_categories_left: List[Category] = []
         self._sort_categories_right: List[Category] = []
         self._sort_categories_middle: List[Category] = []
-        self._sort_left_data: Dict[Dict] = {"var": 0, "go": {}}
-        self._sort_right_data: Dict[Dict] = {"var": 0, "go": {}}
+        self._sort_left_data: Dict[str, Dict] = {"var": 0, "go": {}}
+        self._sort_right_data: Dict[str, Dict] = {"var": 0, "go": {}}
 
     def set_cog_category(self, category: Category):
         def ctg(cls: type):
