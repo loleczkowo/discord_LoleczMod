@@ -1,6 +1,5 @@
 from discord.ext.commands import Bot
 from discord import Guild, ChannelType, Role, Member
-from typing import Self
 
 
 class Chain:
@@ -8,7 +7,7 @@ class Chain:
         self.fullreq = fullreq
         self.attrs = attrs
 
-    def __getattr__(self, name) -> Self | ChannelType | Role | Member:
+    def __getattr__(self, name) -> Chain | ChannelType | Role | Member:
         if name in self.attrs:
             if isinstance(self.attrs[name], dict):
                 return Chain(self.attrs[name], name)
@@ -59,7 +58,7 @@ class IDsObjects:
         self.objects = await self._build(self.target_ids, "MAIN", bot, None)
         self.is_build = True
 
-    def __getattr__(self, name) -> Chain | ChannelType | Role | Member:
+    def __getattr__(self, name) -> Chain | ChannelType | Role | Member | Guild:
         if not self.is_build:
             raise AttributeError("IDsObjects has not been built yet")
         if name in self.objects:
