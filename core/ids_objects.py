@@ -1,3 +1,4 @@
+from __future__ import annotations
 from discord.ext.commands import Bot
 from discord import Guild, ChannelType, Role, Member
 
