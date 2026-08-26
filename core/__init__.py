@@ -3,7 +3,7 @@ from .utils import (
     format_traceback, traceback_lines, format_time, human_type, human_type_OptionType)
 from .highlevel_utils import run_shutdown, embed_from_message
 from .handle_command_error import setup, check_error
-from .check_permission import app_is_owner, must_be_refering
+from .check_permission import app_is_owner, must_be_refering, check_hierarchy
 from .memory import Memory
 
 __all__ = [
@@ -13,6 +13,6 @@ __all__ = [
     "run_shutdown", "embed_from_message",
     "setup", "check_error",
 
-    "app_is_owner", "must_be_refering",
+    "app_is_owner", "must_be_refering", "check_hierarchy",
     "Memory",
 ]
