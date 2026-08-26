@@ -15,8 +15,7 @@ from config import (
 from globals import Globals
 from cogs import load_cogs, cog_list
 
-# TEMPLATE BY loleczkowo
-# "hope you have a nice day :)" - loleczkowo
+# TEMPLATE BY loleczkowo at https://github.com/loleczkowo/discord-multicog-template/
 
 load_dotenv()
 bot_token = os.getenv("BOT_TOKEN")
