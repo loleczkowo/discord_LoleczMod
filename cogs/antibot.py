@@ -81,5 +81,7 @@ class AntiBot(commands.Cog):
     async def _unban_later(self, user: discord.Member, delay: int):
         await sleep(delay)
         await ids_objects.GUILD.unban(user, reason="unban after bot ban")
+        del self.pending_unbans.mem[str(user.id)]
+        self.pending_unbans.touch()
         log(INFO(to_discord=True), f"**ANTI_DC_BOT: BOT UNBANNED `{user.name}:{user.id}`**")
 
